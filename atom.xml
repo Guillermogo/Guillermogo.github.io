@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-11-19T12:56:57.713Z</updated>
+  <updated>2019-11-19T14:33:23.525Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -18,19 +18,12 @@
   
   <entry>
     <title></title>
-    <link href="http://yoursite.com/2018/11/13/begin/"/>
-    <id>http://yoursite.com/2018/11/13/begin/</id>
-    <published>2018-11-13T15:38:56.539Z</published>
-    <updated>2019-11-19T12:56:57.713Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="start"><a href="#start" class="headerlink" title="start"></a>start</h3>]]></content>
+    <link href="http://yoursite.com/2019/11/19/vueRoute/"/>
+    <id>http://yoursite.com/2019/11/19/vueRoute/</id>
+    <published>2019-11-19T14:33:23.525Z</published>
+    <updated>2019-11-19T14:33:23.525Z</updated>
     
     <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;start&quot;&gt;&lt;a href=&quot;#start&quot; class=&quot;headerlink&quot; title=&quot;start&quot;&gt;&lt;/a&gt;start&lt;/h3&gt;
-      
     
     </summary>
     
