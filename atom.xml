@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-12-21T03:33:54.136Z</updated>
+  <updated>2019-12-22T03:14:40.222Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,19 +17,23 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
+    <title>关于Response Headers *set-cookie* 无法自动保存到浏览器Application cookies</title>
     <link href="http://yoursite.com/2019/12/05/191205_cookie/"/>
     <id>http://yoursite.com/2019/12/05/191205_cookie/</id>
     <published>2019-12-05T13:12:43.971Z</published>
-    <updated>2019-12-21T03:33:54.136Z</updated>
+    <updated>2019-12-22T03:14:40.222Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="关于Response-Headers-set-cookie-无法自动保存到浏览器Application-cookies"><a href="#关于Response-Headers-set-cookie-无法自动保存到浏览器Application-cookies" class="headerlink" title="关于Response Headers set-cookie 无法自动保存到浏览器Application cookies"></a>关于Response Headers <em>set-cookie</em> 无法自动保存到浏览器Application cookies</h3><blockquote><p>项目中在对接登陆鉴权模块时遇到这个问题。</p></blockquote><pre><code>后台接口Response Headers里有设置set-cookie,但是浏览器中Application cookie中没有写入。</code></pre><h3 id="1-关于cookie"><a href="#1-关于cookie" class="headerlink" title="1. 关于cookie"></a>1. 关于cookie</h3>]]></content>
+    <content type="html"><![CDATA[<blockquote><p>项目中在对接登陆鉴权模块时遇到这个问题。</p></blockquote><pre><code>后台接口Response Headers里有设置set-cookie,但是浏览器中Application cookie中没有写入。</code></pre><ul><li><ol><li><p>关于cookie</p><p>首先遇到这个问题第一想到的就是看大神有没有遇到同样的问题，在找了一些资料以后发现这是后台set-cookie的时候cookie的domain不对，然后通过nginx 代理proxy 添加 proxy_cookie_domian以及proxy_cookie_path ,但是没有起作用。<br>又经过一番探索，在一篇<a href="https://juejin.im/post/5d45679ff265da03970b9cb0" target="_blank" rel="noopener">文章</a>上看到关于proxy_cookie_domian 的定义。</p><blockquote><p>proxy_cookie_domain参数的作用是转换response的set-cookie header中的domain选项，由后端设置的域名domain转换成你的域名replacement，来保证cookie的顺利传递并写入到当前页面中，注意proxy_cookie_domain负责的只是处理response set-cookie头中的domain属性，仅此而已。</p></blockquote></li></ol></li></ul><p>对于没有设置domain参数的cookie,这个参数不起作用，最后经过一番曲折，通过lua在location中拦截到cookie,再重新设置set-cookie。</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;h3 id=&quot;关于Response-Headers-set-cookie-无法自动保存到浏览器Application-cookies&quot;&gt;&lt;a href=&quot;#关于Response-Headers-set-cookie-无法自动保存到浏览器Application-cookies&quot; 
+        &lt;blockquote&gt;
+&lt;p&gt;项目中在对接登陆鉴权模块时遇到这个问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;后台接口Response Headers里有设置set-cookie,但是浏览器中Application cookie中没有写入。
+&lt;/code&gt;&lt;
       
     
     </summary>
