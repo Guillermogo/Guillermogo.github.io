@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><link rel="stylesheet" type="text/css" href="//fonts.loli.net/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.4"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.4"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><title>浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份 | see u</title></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份</h1><a id="logo" href="/.">see u</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份</h1><div class="post-meta"><a href="/2020/01/19/进程及线程/#comments" class="comment-count"></a><p><span class="date">Jan 19, 2020</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><h5 id="浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份"><a href="#浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份" class="headerlink" title="浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份"></a>浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份</h5><pre><code>最近在学习js异步的时候，接触到进程（process），线程（thread）及宏任务（macro task）、微任务（micro task）等这些知识的时候还是不能很好的理解透彻，以前也有零散的学习过其中的知识点，但是~~看过则忘，未曾有积累。好的下面进入芒果爆爆冰（mogo）的自我催眠学习时间。
+</code></pre><ol>
+<li><p>进程（process）和线程（thread）</p>
+<blockquote>
+<p> 进程和线程是操作系统的基本概念，需要对其有个基本的认知。</p>
+</blockquote>
+<ul>
+<li>进程<br> 学术上讲，进程是一个具有独立功能的程序在数据集上动态执行的一个过程，是操作系统调度、分配资源的一个独立单位，也是应用程序运行的载体。<br><strong>任一时刻，CPU总是运行一个进程，其他进程处于非运行状态。</strong></li>
+<li>线程<br>  早期的操作系统中并没有线程概念，但是随着对进程的要求越来越高，无法满足复杂的程序需求。这是线程应运而生，线程是程序执行中一个单一的顺序控制流程，是执行程序流的最小单元。</li>
+<li>进程和线程的区别和联系<br>  1) 进程是操作系统资源分配的基本单位；线程是任务调度和执行的基本单位<br>  2) 开销：进程都有独立的代码和数据空间，程序切换之间会有大的开销；同类线程共享代码和数据空间，每个线程都有独立的运行栈，开销较小<br>  3) 内存：系统在运行的时候会为每个内存分配不同的内存空间；对于线程而言，除了CPU外，系统不会为线程分配内存（线程所使用的资源来自其所属进程的资源），线程组之间只能共享资源。</li>
+</ul>
+<ol start="2">
+<li><p>多进程和多线程</p>
+<ul>
+<li>多进程<br>指的是同一时间里，同一个操作系统中如果允许两个或两个以上的进程处于运行状态。</li>
+<li>多线程<br>指程序中包含多个执行流，即允许一个程序同时运行多个不同的线程来执行不同的任务，也就是允许单个程序创建多个并行执行的线程来完成各自的任务。</li>
+</ul>
+</li>
+<li><p>浏览器是多进程的,浏览器都包含哪些进程？</p>
+</li>
+</ol>
+<ul>
+<li><p>Browser进程：浏览器的主进程，只有一个，作用有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 负责浏览器界面显示，与用户交互</span><br><span class="line">2. 负责各个页面的管理，创建和销毁其他进程</span><br><span class="line">3. 将Renderer进程得到的内存中的Bitmap，绘制到用户界面</span><br><span class="line">4. 网络资源的管理，下载等</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第三方插件进程，每种类型的插件对应一个进程，仅当是使用该插件时才创建</li>
+<li>GPU 进程，用于界面的3D绘制，只有一个</li>
+<li>渲染进程（浏览器内核），主要作用页面渲染，脚本执行，事件处理等，内部是多线程的</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li>浏览器内核（渲染进程）</li>
+</ol>
+<ul>
+<li><p>GUI 渲染线程</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 负责渲染浏览器界面，解析html，css，构建DOM树和renderObject树，布局和绘制等</span><br><span class="line">2. 当界面需要重绘（repaint）时或者由于某种操作引发回流（flow）时，该线程就会执行</span><br><span class="line">3. **该线程和JS引擎线程是互斥的**，当JS引擎执行时，GUI线程会被暂时挂起，GUI更新会保存在一个队列中等待JS引擎执空闲时立即执行，这里有的朋友就会有疑问了，为啥会互斥呢？   -- 由于JS是可以操作DOM的，如果在修改这些元素属性同时渲染界面（即两个线程同时执行），那在渲染时前后数据就会有冲突。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>js 引擎线程，也可以称为JS内核，主要负责处理Javascript脚本程序，例如V8引擎</p>
+</li>
+<li>事件触发线程，当一个事件触发时该线程会把执行的事件添加到待处理列的队尾，等待JS引擎处理。</li>
+<li>定时触发器线程，因为JS引擎是单线程的，如果处于阻塞状态，就会影响计时的准确性，所以新开一个线程执行计时并触发定时更为合理</li>
+<li>xmlhttp 请求线程，在XMLHttpRequest在连接后是通过浏览器新开一个线程请求， 将检测到状态变更时，如果设置有回调函数，异步线程就产生状态变更事件放到 JavaScript引擎的处理队列中等待处理。</li>
+</ul>
+</li>
+<li><p>任务队列 （这个概念还不是很清楚）</p>
+<ul>
+<li><del>JS 分为同步任务和异步任务</del></li>
+<li><del>同步任务都都在JS线程上执行，形成一个执行栈</del></li>
+<li><del>在JS 线程之外，事件触发线程管理着一个任务队列，只要异步任务有了结果就在任务队列之中放置一个</del></li>
+</ul>
+<ol start="6">
+<li><p>宏任务（macro task）<br> 可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）。注意 ：<br>浏览器为了能够使得JS内部(macro)task与DOM任务能够有序的执行，会在一个(macro)task执行结束后，在下一个(macro)task 执行开始前，对页面进行重新渲染。</p>
+<p>(macro)task主要包含：script(整体代码)、setTimeout、setInterval、I/O、UI交互事件、postMessage、MessageChannel、setImmediate(Node.js 环境)。</p>
+</li>
+<li><p>微任务（micro task）<br>可以理解是在当前 task 执行结束后立即执行的任务。也就是说，在当前task任务后，下一个task之前，在渲染之前。</p>
+<p>microtask主要包含：Promise.then、MutaionObserver、process.nextTick(Node.js 环境)。</p>
+</li>
+<li><p>运行机制</p>
+<p>在事件循环中，每进行一次循环操作称为 tick，每一次 tick 的任务处理模型是比较复杂的，但关键步骤如下：</p>
+<ul>
+<li>执行一个宏任务（栈中没有就从事件队列中获取）</li>
+<li>执行过程中如果有遇到微任务，就添加到微任务的任务队列中</li>
+<li>宏任务执行完毕后，立即执行当前微任务队列中的所有为微任务</li>
+<li>当前宏任务执行完毕后，开始检查渲染，GUI线程接管渲染</li>
+<li>渲染完毕后，JS引擎继续接管，开始下一个宏任务</li>
+</ul>
+<p>流程如下： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">graph TB</span><br><span class="line">start[宏任务] --&gt; input[执行结束]</span><br><span class="line">input --&gt; conditionA&#123;是否有微任务?&#125;</span><br><span class="line">conditionA --有--&gt; micro[执行所有微任务]</span><br><span class="line">micro --&gt; render[浏览器渲染]</span><br><span class="line">conditionA --无--&gt; render</span><br><span class="line">render --执行--&gt; start</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+</div><div class="post-copyright"><blockquote><p>原文作者: Guiller</p><p>原文链接: <a href="http://yoursite.com/2020/01/19/进程及线程/">http://yoursite.com/2020/01/19/进程及线程/</a></p><p>版权声明: 转载请注明出处(必须保留作者署名及链接)</p></blockquote></div><div class="tags"><a href="/tags/process-thread-macro-task-micro-task/">process, thread, macro task, micro task</a></div><div class="post-share"><div class="social-share"><span>分享到:</span></div></div><div class="post-nav"><a href="/2019/12/05/191205_cookie/" class="next">关于Response Headers *set-cookie* 无法自动保存到浏览器Application cookies</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份"><span class="toc-text">浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/01/19/进程及线程/">浏览器多进程到JS单线程，JS运行机制，JS事件循环机制学习备份</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/05/191205_cookie/">关于Response Headers *set-cookie* 无法自动保存到浏览器Application cookies</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/hello-world/">Hello World</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/cookie/" style="font-size: 15px;">cookie</a> <a href="/tags/process-thread-macro-task-micro-task/" style="font-size: 15px;">process, thread, macro task, micro task</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-you"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">网站地图</a> |  <a href="/atom.xml">订阅本站</a> |  <a href="/about/">联系博主</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次，本站总访客数:<i id="busuanzi_container_site_uv"><i id="busuanzi_value_site_uv"></i></i>人</p><p><span> Copyright &copy;<a href="/." rel="nofollow">Guiller.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.4"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.4" async></script><link rel="stylesheet" type="text/css" href="/share/css/share.css"><script type="text/javascript" src="/share/js/social-share.js" charset="utf-8"></script><script type="text/javascript" src="/share/js/qrcode.js" charset="utf-8"></script></body></html>
