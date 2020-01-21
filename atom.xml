@@ -44,9 +44,9 @@
     <link href="http://yoursite.com/2019/12/05/191205_cookie/"/>
     <id>http://yoursite.com/2019/12/05/191205_cookie/</id>
     <published>2019-12-05T13:12:43.971Z</published>
-    <updated>2020-01-19T14:00:15.567Z</updated>
+    <updated>2020-01-21T04:35:15.868Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="关于-Response-Headers-set-cookie-无法自动保存到浏览器-Application-cookies"><a href="#关于-Response-Headers-set-cookie-无法自动保存到浏览器-Application-cookies" class="headerlink" title="关于 Response Headers set-cookie 无法自动保存到浏览器 Application cookies"></a>关于 Response Headers <em>set-cookie</em> 无法自动保存到浏览器 Application cookies</h3><blockquote><p>项目中在对接登陆鉴权模块时遇到这个问题。</p></blockquote><p>后台接口 Response Headers 里有设置 set-cookie,但是浏览器中 Application cookie 中没有写入。</p><ol><li><p>问题解决</p><p>首先遇到这个问题第一想到的就是看大神有没有遇到同样的问题，在找了一些资料以后发现这是后台 set-cookie 的时候 cookie 的 domain 不对，然后通过 nginx 代理 proxy 添加 proxy_cookie_domian 以及 proxy_cookie_path ,但是没有起作用。<br>又经过一番探索，在一篇<a href="https://juejin.im/post/5d45679ff265da03970b9cb0" target="_blank" rel="noopener">文章</a>上看到关于 proxy_cookie_domian 的定义。</p><blockquote><p>proxy_cookie_domain 参数的作用是转换 response 的 set-cookie header 中的 domain 选项，由后端设置的域名 domain 转换成你的域名 replacement，来保证 cookie 的顺利传递并写入到当前页面中，注意 proxy_cookie_domain 负责的只是处理 response set-cookie 头中的 domain 属性，仅此而已。</p></blockquote></li></ol><p>对于没有设置 domain 参数的 cookie,这个参数不起作用，最后经过一番曲折，通过 lua 在 location 中拦截到 cookie,再重新设置 set-cookie。</p><ol start="2"><li>关于cookie知识介绍</li></ol>]]></content>
+    <content type="html"><![CDATA[<h3 id="关于-Response-Headers-set-cookie-无法自动保存到浏览器-Application-cookies"><a href="#关于-Response-Headers-set-cookie-无法自动保存到浏览器-Application-cookies" class="headerlink" title="关于 Response Headers set-cookie 无法自动保存到浏览器 Application cookies"></a>关于 Response Headers <em>set-cookie</em> 无法自动保存到浏览器 Application cookies</h3><blockquote><p>项目中在对接登陆鉴权模块时遇到这个问题。</p></blockquote><p>后台接口 Response Headers 里有设置 set-cookie,但是浏览器中 Application cookie 中没有写入。</p><ol><li><p>问题解决</p><p>首先遇到这个问题第一想到的就是看大神有没有遇到同样的问题，在找了一些资料以后发现这是后台 set-cookie 的时候 cookie 的 domain 不对，然后通过 nginx 代理 proxy 添加 proxy_cookie_domian 以及 proxy_cookie_path ,但是没有起作用。<br>又经过一番探索，在一篇<a href="https://juejin.im/post/5d45679ff265da03970b9cb0" target="_blank" rel="noopener">文章</a>上看到关于 proxy_cookie_domian 的定义。</p><blockquote><p>proxy_cookie_domain 参数的作用是转换 response 的 set-cookie header 中的 domain 选项，由后端设置的域名 domain 转换成你的域名 replacement，来保证 cookie 的顺利传递并写入到当前页面中，注意 proxy_cookie_domain 负责的只是处理 response set-cookie 头中的 domain 属性，仅此而已。</p></blockquote></li></ol><p>对于没有设置 domain 参数的 cookie,这个参数不起作用，最后经过一番曲折，通过 lua 在 location 中拦截到 cookie,再重新设置 set-cookie。</p>]]></content>
     
     <summary type="html">
     
@@ -59,27 +59,6 @@
     
     
       <category term="cookie" scheme="http://yoursite.com/tags/cookie/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://yoursite.com/2018/11/13/hello-world/"/>
-    <id>http://yoursite.com/2018/11/13/hello-world/</id>
-    <published>2018-11-13T05:17:50.579Z</published>
-    <updated>2018-11-14T23:52:54.638Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
-      
-    
-    </summary>
-    
     
   </entry>
   
